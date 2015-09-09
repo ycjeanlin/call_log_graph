@@ -66,8 +66,22 @@ def split_train_test(total_size):
         for row in testing_rows:
             fw.write(row)
 
+def gen_tel_list(call_logs, output_file):
+    tel_list = set()
+    with codecs.open(call_logs, 'r') as fr:
+        fw = codecs.open(output_file, 'w')
+        for row in fr:
+            cols = row.strip().split('\t')
+            tel_list.add(cols[1])
+
+        for caller in tel_list:
+            fw.write(caller + '\n')
+
+        fw.close()
+
 
 if __name__ == '__main__':
     #extract_tel_logs('../whoscall_data/call_201408_tw.csv')
-    num_log = find_effective_logs(0, './data/tel_log_tw.dat')
-    split_train_test(num_log)
+    #num_log = find_effective_logs(0, './data/tel_log_tw.dat')
+    #split_train_test(num_log)
+    gen_tel_list('./data/train.dat', './data/train_tel_list.dat')
