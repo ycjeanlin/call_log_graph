@@ -1,1 +1,7 @@
 .idea/
+tmp.py
+block_times_tw.csv
+sample_log.dat
+tel_log_tw.dat
+tel_log.dat
+telemarketing_list.dat
