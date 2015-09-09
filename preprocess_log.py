@@ -24,5 +24,24 @@ def extract_tel_logs(call_logs):
         fw.close()
 
 
+def find_effective_logs(threshold, tel_logs):
+    with codecs.open(tel_logs, 'r') as fr:
+        fw = codecs.open('tel_log_0.dat', 'w')
+        index = 0
+        for row in fr:
+            index += 1
+            if (index % 100000) == 0:
+                print index
+
+            cols = row.strip().split('\t')
+            duration = int(cols[4])
+            if duration > threshold:
+                fw.write(cols[1] + '\t' + cols[2] + '\t' + cols[3]+ '\t' + cols[4] + '\n')
+
+        print 'Line Number: ', index
+        fw.close()
+
+
 if __name__ == '__main__':
-    extract_tel_logs('../whoscall_data/call_201408_tw.csv')
+    #extract_tel_logs('../whoscall_data/call_201408_tw.csv')
+    find_effective_logs(0, 'tel_log_tw.dat')
