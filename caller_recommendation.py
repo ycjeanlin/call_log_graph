@@ -1,7 +1,6 @@
 import cPickle
 import operator
 import codecs
-import networkx as nx
 
 
 def load_graph(filename):
@@ -10,17 +9,17 @@ def load_graph(filename):
     return graph
 
 
-def recommend_users(caller, graph, max_degree, step):
-    users_list = {}
-    nodes = set(caller)
+def recommend_users(caller, graph, max_degree, step, popularity):
+    user_list = {}
+    nodes = set()
+    nodes.add(caller)
 
     while step > 1:
         next_nodes = set()
         for node in nodes:
             neighbors = graph.neighbors(node)
             for n in neighbors:
-                if graph.degree(n) < max_degree and graph.degree(n) > 1:
-                     next_nodes.add(n)
+                    next_nodes.add(n)
 
         # step update
         nodes = next_nodes
@@ -29,38 +28,42 @@ def recommend_users(caller, graph, max_degree, step):
     for node in nodes:
         neighbors = graph.neighbors(node)
         for n in neighbors:
-            if graph.degree(n) < max_degree and graph.degree(n) > 1:
-                next_nodes.add(n)
-                if n in users_list:
-                     users_list[n] += 1
+            if graph.degree(n) < max_degree:
+                if n in user_list:
+                    user_list[n] += 1
                 else:
-                    users_list[n] = 1
+                    user_list[n] = 1
+
     neighbors = graph.neighbors(caller)
-    for user in users_list:
-        if users_list[user] < 5 or user in neighbors:
-            users_list.pop(user)
+    candidate_users = {}
+    for user in user_list:
+        if user_list[user] >= popularity and user not in neighbors:
+            candidate_users[user] = user_list[user]
 
-    sorted_users = sorted(users_list.items(), key=operator.itemgetter(1), reverse=True)
+    sorted_users = sorted(candidate_users.items(), key=operator.itemgetter(1), reverse=True)
+    user_ids = [x[0] for x in sorted_users]
 
-    return sorted_users
+    return user_ids
 
 
 if __name__ == '__main__':
+    input_file = 'test_list'
+    output_file = 'recommend_list.dat'
+
     print 'Graph loading'
     call_log_graph = load_graph('output.model')
 
     print ''
-    with codecs.open('./data/train_tel_list.dat', 'r') as fr:
+    with codecs.open(input_file, 'r') as fr:
         tel_callers = fr.readlines()
 
-    with codecs.open('recommend_list.dat', 'w') as fw:
+    with codecs.open(output_file, 'w') as fw:
         index = 0
         for tel_caller in tel_callers:
-            print tel_caller
             index += 1
-            if (index % 1000) == 0:
+            if (index % 10) == 0:
                 print index
 
-            recommended_users = recommend_users(tel_caller, call_log_graph, 2, 3).keys()
+            recommended_users = recommend_users(tel_caller.strip(), call_log_graph, 10, 3, 10)
 
-            fw.write(tel_caller + '\t' + '\t'.join(recommended_users) + '\n')
+            fw.write(tel_caller.strip() + '\t' + '\t'.join(recommended_users) + '\n')

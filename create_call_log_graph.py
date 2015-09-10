@@ -13,7 +13,7 @@ def create_graph(tel_logs):
             if (index % 100000) == 0:
                 print index
 
-            cols = row.strip().split('\t')
+            cols = row.strip().split()
             if cols[0] not in graph:
                 graph.add_node(cols[0])
 
@@ -33,7 +33,8 @@ def write_graph(filename, graph):
 
 if __name__ == '__main__':
     print 'Graph creating'
-    call_log_graph = create_graph('./data/train.dat')
+    input_file = 'test'
+    call_log_graph = create_graph(input_file)
 
     print 'Graph storing'
     write_graph('output.model', call_log_graph)

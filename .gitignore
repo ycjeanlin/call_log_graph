@@ -4,3 +4,4 @@ block_times_tw.csv
 *.dat
 data/
 output.model
+test*
