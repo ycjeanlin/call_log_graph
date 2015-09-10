@@ -33,7 +33,7 @@ def write_graph(filename, graph):
 
 if __name__ == '__main__':
     print 'Graph creating'
-    input_file = 'test'
+    input_file = './data/train.dat'
     call_log_graph = create_graph(input_file)
 
     print 'Graph storing'

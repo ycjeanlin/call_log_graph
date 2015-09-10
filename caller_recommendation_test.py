@@ -55,7 +55,7 @@ if __name__ == '__main__':
 
     print ''
     with codecs.open(input_file, 'r') as fr:
-        tel_callers = fr.readlines()
+        tel_callers = [x.strip().split('\t')[0] for x in fr.readlines()]
 
     with codecs.open(output_file, 'w') as fw:
         index = 0
@@ -64,6 +64,6 @@ if __name__ == '__main__':
             if (index % 10) == 0:
                 print index
 
-            recommended_users = recommend_users(tel_caller.strip(), call_log_graph, 10, 3, 10)
+            recommended_users = recommend_users(tel_caller, call_log_graph, 10, 3, 10)
 
-            fw.write(tel_caller.strip() + '\t' + '\t'.join(recommended_users) + '\n')
+            fw.write(tel_caller + '\t' + '\t'.join(recommended_users) + '\n')
