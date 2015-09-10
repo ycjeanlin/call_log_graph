@@ -63,30 +63,13 @@ def split_train_test(tel_call_list, output_train, output_test, min_occur):
                     testing_cols = [cols[i] for i in testing_index]
 
                     for col in training_cols:
-                        fw_train.write(cols[0] + '\t' + col + '\n')
+                        fw_train.write(col + '\t' + cols[0]  + '\n')
 
                     for col in testing_cols:
-                        fw_test.write(cols[0] + '\t' + col + '\n')
+                        fw_test.write(col + '\t' + cols[0] + '\n')
     fw_test.close()
     fw_train.close()
 
-def gen_tel_list(call_logs, output_file):
-    tel_list = {}
-    with codecs.open(call_logs, 'r') as fr:
-        fw = codecs.open(output_file, 'w')
-        for row in fr:
-            cols = row.strip().split('\t')
-            if cols[1] in tel_list:
-                tel_list[cols[1]] += 1
-            else:
-                tel_list[cols[1]] = 1
-
-        sorted_tels = sorted(tel_list.items(), key=operator.itemgetter(1), reverse=True)
-
-        for caller in sorted_tels:
-            fw.write(caller[0] + '\t' + str(caller[1]) + '\n')
-
-        fw.close()
 
 def gen_tel_call_list(call_log, output_file):
     print 'Generate telemarketing number call list', call_log
@@ -112,9 +95,8 @@ def gen_tel_call_list(call_log, output_file):
         fw.close()
 
 if __name__ == '__main__':
-    extract_tel_logs('../whoscall_data/call_201408_tw.csv', './data/tel_log_tw.dat')
-    find_effective_logs(0, './data/tel_log_tw.dat', './data/tel_log_0.dat')
-    gen_tel_call_list('./data/tel_call_list_0.dat', './data/tel_call_list_all.dat')
-    split_train_test('./data/tel_call_list_all.dat', './data/train.dat', './data/test.dat', 6)
-    #gen_tel_list('./data/train.dat', './data/train_tel_list.dat')
+    #extract_tel_logs('../whoscall_data/call_201408_tw.csv', './data/tel_log_tw.dat')
+    #find_effective_logs(0, './data/tel_log_tw.dat', './data/tel_log_0.dat')
+    #gen_tel_call_list('./data/tel_log_0.dat', './data/tel_call_list_0.dat')
+    split_train_test('./data/tel_call_list_0.dat', './data/train.dat', './data/test.dat', 6)
     gen_tel_call_list('./data/test.dat', './data/tel_call_list_test.dat')

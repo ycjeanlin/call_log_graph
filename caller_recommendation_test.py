@@ -50,12 +50,15 @@ def recommend_users(caller, graph, max_degree, step, popularity):
 
 def cal_performance(called_list, user_list):
     true_positive = 0.0
+    p = 0.0
+    r = 0.0
     for user in user_list:
         if user in called_list:
             true_positive += 1
     print 'True Positive: ', true_positive
-    p = true_positive / len(user_list)
-    r = true_positive / len(called_list)
+    if len(user_list) > 0 and len(called_list) > 0:
+        p = true_positive / len(user_list)
+        r = true_positive / len(called_list)
 
     return p, r
 
