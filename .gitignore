@@ -5,3 +5,6 @@ block_times_tw.csv
 data/
 output.model
 test*
+*.model
+*.txt
+*.csv

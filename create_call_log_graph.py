@@ -34,7 +34,8 @@ def write_graph(filename, graph):
 if __name__ == '__main__':
     print 'Graph creating'
     input_file = './data/train.dat'
+    output_model = './graph.model'
     call_log_graph = create_graph(input_file)
 
     print 'Graph storing'
-    write_graph('output.model', call_log_graph)
+    write_graph(output_model, call_log_graph)

@@ -41,29 +41,55 @@ def recommend_users(caller, graph, max_degree, step, popularity):
             candidate_users[user] = user_list[user]
 
     sorted_users = sorted(candidate_users.items(), key=operator.itemgetter(1), reverse=True)
-    user_ids = [x[0] for x in sorted_users]
+    user_ids = []
+    for user in sorted_users:
+        user_ids.append(user[0])
 
     return user_ids
 
 
+def cal_performance(called_list, user_list):
+    true_positive = 0.0
+    for user in user_list:
+        if user in called_list:
+            true_positive += 1
+    print 'True Positive: ', true_positive
+    p = true_positive / len(user_list)
+    r = true_positive / len(called_list)
+
+    return p, r
+
+
 if __name__ == '__main__':
-    input_file = 'test_list'
-    output_file = 'recommend_list.dat'
+    input_file = './data/tel_call_list_test.dat'
+    input_model = './graph.model'
+    exp_file = './performance.csv'
 
     print 'Graph loading'
-    call_log_graph = load_graph('output.model')
+    call_log_graph = load_graph(input_model)
 
-    print ''
-    with codecs.open(input_file, 'r') as fr:
-        tel_callers = [x.strip().split('\t')[0] for x in fr.readlines()]
+    print 'Test data loading'
+    tel_call_list = {}
+    fr = codecs.open(input_file, 'r')
+    for row in fr:
+        cols = row.strip().split('\t')
+        tel_call_list[cols[0]] = []
+        for i in range(1, len(cols)):
+            tel_call_list[cols[0]].append(cols[i])
 
-    with codecs.open(output_file, 'w') as fw:
-        index = 0
-        for tel_caller in tel_callers:
-            index += 1
-            if (index % 10) == 0:
-                print index
+    index = 0
+    fw = codecs.open(exp_file, 'w')
+    for caller in tel_call_list:
+        index += 1
+        if (index % 10) == 0:
+            print index
 
-            recommended_users = recommend_users(tel_caller, call_log_graph, 10, 3, 10)
+        print 'Caller: ', caller
+        recommended_users = recommend_users(caller, call_log_graph, 100, 3, 1)
+        precision, recall = cal_performance(tel_call_list[caller], recommended_users)
+        print 'Precision: ', precision
+        print 'Recall: ', recall
+        fw.write(caller + ',' + str(precision) + ',' + str(recall) + '\n')
 
-            fw.write(tel_caller + '\t' + '\t'.join(recommended_users) + '\n')
+    fw.close()
+

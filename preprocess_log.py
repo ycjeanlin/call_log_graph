@@ -3,7 +3,8 @@ import operator
 from sklearn.cross_validation import train_test_split
 
 
-def extract_tel_logs(call_logs):
+def extract_tel_logs(call_logs, output_file):
+    print 'Extract telemarketing logs from original call logs'
     tel_set = set()
     with codecs.open('./data/telemarketing_list.dat', 'r') as fr:
         rows = fr.readlines()
@@ -12,7 +13,7 @@ def extract_tel_logs(call_logs):
             tel_set.add(cols[0])
 
     with codecs.open(call_logs, 'r') as fr:
-        fw = codecs.open('./data/tel_log_tw.dat', 'w')
+        fw = codecs.open(output_file, 'w')
         index = 0
         for row in fr:
             index += 1
@@ -26,9 +27,10 @@ def extract_tel_logs(call_logs):
         fw.close()
 
 
-def find_effective_logs(threshold, tel_logs):
+def find_effective_logs(threshold, tel_logs, output_file):
+    print 'Find effective logs which duration bigger than ', threshold
     with codecs.open(tel_logs, 'r') as fr:
-        fw = codecs.open('./data/tel_log_0.dat', 'w')
+        fw = codecs.open(output_file, 'w')
         index = 0
         size = 0
         for row in fr:
@@ -47,16 +49,15 @@ def find_effective_logs(threshold, tel_logs):
         return size
 
 
-def split_train_test(tel_call_list):
-
-    print 'Splitting'
-    fw_train = codecs.open('./data/train.dat', 'w')
-    fw_test = codecs.open('./data/test.dat', 'w')
+def split_train_test(tel_call_list, output_train, output_test, min_occur):
+    print 'Splitting training data and testing data'
+    fw_train = codecs.open(output_train, 'w')
+    fw_test = codecs.open(output_test, 'w')
     with codecs.open(tel_call_list, 'r') as fr:
         for row in fr:
             cols = row.strip().split('\t')
-            if len(cols) >= 4:
-                training_index, testing_index = train_test_split(range(1, len(cols)), test_size=0.4, random_state=7)
+            if len(cols) >= (min_occur + 1):
+                training_index, testing_index = train_test_split(range(1, len(cols)), test_size=0.3, random_state=7)
                 if len(training_index) > 0 and len(testing_index) > 0:
                     training_cols = [cols[i] for i in training_index]
                     testing_cols = [cols[i] for i in testing_index]
@@ -88,6 +89,7 @@ def gen_tel_list(call_logs, output_file):
         fw.close()
 
 def gen_tel_call_list(call_log, output_file):
+    print 'Generate telemarketing number call list', call_log
     with codecs.open(call_log, 'r') as fr:
         fw = codecs.open(output_file, 'w')
         tel_called_list = {}
@@ -110,8 +112,9 @@ def gen_tel_call_list(call_log, output_file):
         fw.close()
 
 if __name__ == '__main__':
-    #extract_tel_logs('../whoscall_data/call_201408_tw.csv')
-    #num_log = find_effective_logs(0, './data/tel_log_tw.dat')
-    #split_train_test('./data/tel_call_list_0.dat')
+    extract_tel_logs('../whoscall_data/call_201408_tw.csv', './data/tel_log_tw.dat')
+    find_effective_logs(0, './data/tel_log_tw.dat', './data/tel_log_0.dat')
+    gen_tel_call_list('./data/tel_call_list_0.dat', './data/tel_call_list_all.dat')
+    split_train_test('./data/tel_call_list_all.dat', './data/train.dat', './data/test.dat', 6)
     #gen_tel_list('./data/train.dat', './data/train_tel_list.dat')
     gen_tel_call_list('./data/test.dat', './data/tel_call_list_test.dat')

@@ -45,7 +45,7 @@ def recommend_users(caller, graph, max_degree, step, popularity):
     sorted_users = sorted(candidate_users.items(), key=operator.itemgetter(1), reverse=True)
     user_ids = []
     for user in sorted_users:
-        print user[0], user[1]
+        #print user[0], user[1]
         user_ids.append(user[0])
     #user_ids = [x[0] for x in sorted_users]
 
@@ -57,7 +57,7 @@ def cal_performance(called_list, user_list):
     for user in user_list:
         if user in called_list:
             true_positive += 1
-
+    print 'True Positive: ', true_positive
     p = true_positive / len(user_list)
     r = true_positive / len(called_list)
 
@@ -66,11 +66,11 @@ def cal_performance(called_list, user_list):
 if __name__ == '__main__':
 
     print 'Graph loading'
-    call_log_graph = load_graph('output.model')
-    
+    call_log_graph = load_graph('test.model')
+
     print 'Test data loading'
     tel_call_list = {}
-    fr = codecs.open('./data/tel_call_list_test.dat', 'r')
+    fr = codecs.open('test_tel_call_list', 'r')
     for row in fr:
         cols = row.strip().split('\t')
         tel_call_list[cols[0]] = []
