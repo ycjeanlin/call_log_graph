@@ -129,7 +129,7 @@ if __name__ == '__main__':
 
         #print 'Caller: ', caller
         #recommended_users = recommend_users(caller, call_log_graph, 200, 3, 1)
-        recommended_users = recommend_users_similarity(call_log_graph, caller, 0.3, 100)
+        recommended_users = recommend_users_similarity(call_log_graph, caller, 0.2, 100)
         true_positive, precision, recall = cal_performance(tel_call_list[caller], recommended_users)
         #print 'Precision: ', precision
         #print 'Recall: ', recall
