@@ -8,6 +8,46 @@ def load_graph(filename):
         graph = cPickle.load(fp)
     return graph
 
+def recommend_users_similarity(graph, main_caller, min_similarity, topk):
+
+    caller_neighbors = graph.neighbors(main_caller)
+    num_neighbors = len(caller_neighbors)
+    caller_paths = {}
+    for user in caller_neighbors:
+        for n in graph.neighbors(user):
+            if n in caller_paths:
+                caller_paths[n] += 1
+            else:
+                caller_paths[n] = 1
+
+    referrers = {}
+    for caller in caller_paths:
+        if caller_paths[caller] / float(num_neighbors) >= min_similarity:
+            referrers[caller] = caller_paths[caller]
+
+    user_paths = {}
+    for referrer in referrers:
+        if referrer != main_caller:
+            users = graph.neighbors(referrer)
+            num_paths = referrers[referrer]
+            for user in users:
+                if user not in caller_neighbors:
+                    if user in user_paths:
+                        user_paths[user] += num_paths
+                    else:
+                        user_paths[user] = num_paths
+
+    sorted_users = sorted(user_paths.items(), key=operator.itemgetter(1), reverse=True)
+
+    candidate_users = []
+    i = 0
+    num_users = len(sorted_users)
+    while i < num_users and i < topk:
+        candidate_users.append(sorted_users[i][0])
+        i += 1
+
+    return candidate_users
+
 
 def recommend_users(caller, graph, max_degree, step, popularity):
     user_list = {}
@@ -49,18 +89,18 @@ def recommend_users(caller, graph, max_degree, step, popularity):
 
 
 def cal_performance(called_list, user_list):
-    true_positive = 0.0
+    tp = 0.0
     p = 0.0
     r = 0.0
     for user in user_list:
         if user in called_list:
-            true_positive += 1
-    print 'True Positive: ', true_positive
-    if len(user_list) > 0 and len(called_list) > 0:
-        p = true_positive / len(user_list)
-        r = true_positive / len(called_list)
+            tp += 1
 
-    return p, r
+    if len(user_list) > 0 and len(called_list) > 0:
+        p = tp / len(user_list)
+        r = tp / len(called_list)
+
+    return tp, p, r
 
 
 if __name__ == '__main__':
@@ -87,12 +127,13 @@ if __name__ == '__main__':
         if (index % 10) == 0:
             print index
 
-        print 'Caller: ', caller
-        recommended_users = recommend_users(caller, call_log_graph, 100, 3, 1)
-        precision, recall = cal_performance(tel_call_list[caller], recommended_users)
-        print 'Precision: ', precision
-        print 'Recall: ', recall
-        fw.write(caller + ',' + str(precision) + ',' + str(recall) + '\n')
+        #print 'Caller: ', caller
+        #recommended_users = recommend_users(caller, call_log_graph, 200, 3, 1)
+        recommended_users = recommend_users_similarity(call_log_graph, caller, 0.3, 100)
+        true_positive, precision, recall = cal_performance(tel_call_list[caller], recommended_users)
+        #print 'Precision: ', precision
+        #print 'Recall: ', recall
+        fw.write(caller + ',' + str(true_positive)+ ',' + str(precision) + '\n')
 
     fw.close()
 

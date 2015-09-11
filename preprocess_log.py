@@ -84,10 +84,10 @@ def gen_tel_call_list(call_log, output_file):
 
             cols = row.strip().split()
             if cols[1] in tel_called_list:
-                tel_called_list[cols[1]].append(cols[0])
+                tel_called_list[cols[1]].add(cols[0])
             else:
-                tel_called_list[cols[1]] = []
-                tel_called_list[cols[1]].append(cols[0])
+                tel_called_list[cols[1]] = set()
+                tel_called_list[cols[1]].add(cols[0])
 
         for caller in tel_called_list:
             fw.write(caller + '\t' + '\t'.join(tel_called_list[caller]) + '\n')
@@ -97,6 +97,6 @@ def gen_tel_call_list(call_log, output_file):
 if __name__ == '__main__':
     #extract_tel_logs('../whoscall_data/call_201408_tw.csv', './data/tel_log_tw.dat')
     #find_effective_logs(0, './data/tel_log_tw.dat', './data/tel_log_0.dat')
-    #gen_tel_call_list('./data/tel_log_0.dat', './data/tel_call_list_0.dat')
-    split_train_test('./data/tel_call_list_0.dat', './data/train.dat', './data/test.dat', 6)
+    gen_tel_call_list('./data/tel_log_0.dat', './data/tel_call_list_0.dat')
+    #split_train_test('./data/tel_call_list_0.dat', './data/train.dat', './data/test.dat', 6)
     gen_tel_call_list('./data/test.dat', './data/tel_call_list_test.dat')
